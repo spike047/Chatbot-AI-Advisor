@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description"
+        content="AI-powered career advisor providing personalized career guidance and professional development insights">
+    <title>CareerPath AI Advisor | Professional Career Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+
+        :root {
+
+            --bg-light: #f8fafc;
+            --card-light: #ffffff;
+            --text-light: #1e293b;
+            --user-msg-light: #3b82f6;
+            --bot-bg-light: #f1f5f9;
+            --accent-light: #6366f1;
+            --accent-light-2: #8b5cf6;
+            --border-light: #e2e8f0;
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --input-border-light: #cbd5e1;
+            --success-light: #10b981;
+            --warning-light: #f59e0b;
+            --error-light: #ef4444;
+            --info-light: #3b82f6;
+            --code-bg-light: #e2e8f0;
+            --code-text-light: #334155;
+        }
+
+        body.dark {
+
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --text-dark: #e2e8f0;
+            --user-msg-dark: #6366f1;
+            --bot-bg-dark: #334155;
+            --accent-dark: #818cf8;
+            --accent-dark-2: #a78bfa;
+            --border-dark: #475569;
+            --shadow-dark: rgba(0, 0, 0, 0.25);
+            --input-border-dark: #475569;
+            --success-dark: #10b981;
+            --warning-dark: #f59e0b;
+            --error-dark: #ef4444;
+            --info-dark: #3b82f6;
+            --code-bg-dark: #475569;
+            --code-text-dark: #e2e8f0;
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            opacity: 0;
+            animation: pageFadeIn 0.8s forwards;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+
+        body.dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        @keyframes pageFadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* --- Chat Container Styling --- */
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            max-height: 900px;
+            background: var(--card-light);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 25px var(--shadow-light);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-container:hover {
+            box-shadow: 0 30px 40px rgba(65, 65, 65, 0.966);
+            transform: scale(1.05);
+            transition: transform 0.2s ease;
+        }
+
+        body.dark .chat-container {
+            background: var(--card-dark);
+            box-shadow: 0 10px 25px var(--shadow-dark);
+            border: 1px solid var(--border-dark);
+        }
+
+
+        /* --- Header Section --- */
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        body.dark .chat-header {
+            border-bottom-color: var(--border-dark);
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .chat-title h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0;
+            background: linear-gradient(90deg, var(--accent-light), var(--accent-light-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.dark .chat-title h2 {
+            background: linear-gradient(90deg, var(--accent-dark), var(--accent-dark-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .chat-title-icon {
+            font-size: 1.5rem;
+            color: var(--accent-light);
+        }
+
+        body.dark .chat-title-icon {
+            color: var(--accent-dark);
+        }
+
+        /* Audio controls */
+        .audio-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+            margin-right: 0.5rem;
+            /* Adjusted for better spacing with toggle-dark */
+        }
+
+        .audio-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+
+        body.dark .audio-btn {
+            color: var(--text-dark);
+        }
+
+        .audio-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+        }
+
+        body.dark .audio-btn:hover {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--accent-dark);
+        }
+
+        .audio-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent-light);
+        }
+
+        body.dark .audio-btn.active {
+            background: rgba(129, 140, 248, 0.2);
+            color: var(--accent-dark);
+        }
+
+        /* --- Dark Mode Toggle Button --- */
+        .toggle-dark {
+            background: var(--card-light);
+            color: var(--text-light);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark .toggle-dark {
+            background: var(--card-dark);
+            color: var(--text-dark);
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .toggle-dark:hover {
+            transform: scale(1.1);
+        }
+
+        .toggle-dark::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toggle-dark:hover::before {
+            opacity: 1;
+        }
+
+        /* --- Chat Box Area --- */
+        #chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem 0.5rem;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+            margin: 0 -0.5rem;
+            scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+
+        /* Custom scrollbar */
+        #chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-box::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+        }
+
+        #chat-box::-webkit-scrollbar-thumb {
+            background: var(--accent-light);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        #chat-box::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+
+        body.dark #chat-box::-webkit-scrollbar-thumb {
+            background: var(--accent-dark);
+        }
+
+        body.dark #chat-box::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-light);
+        }
+
+        body.dark .welcome-message {
+            background: rgba(129, 140, 248, 0.1);
+            border-left-color: var(--accent-dark);
+        }
+
+        .welcome-message h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-light);
+        }
+
+        body.dark .welcome-message h3 {
+            color: var(--accent-dark);
+        }
+
+        .welcome-message p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            opacity: 0.8;
+        }
+
+        body.dark .welcome-message p {
+            color: var(--text-dark);
+        }
+
+        /* --- Message Styling --- */
+        .message {
+            max-width: 85%;
+            padding: 0.875rem 1.25rem;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            line-height: 1.5;
+            animation: messageFadeIn 0.3s ease-out forwards;
+            transform: translateY(10px);
+            opacity: 0;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        @keyframes messageFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* User message */
+        .user {
+            background: linear-gradient(135deg, var(--user-msg-light), #4f46e5);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark .user {
+            background: linear-gradient(135deg, var(--user-msg-dark), #7c3aed);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Bot message */
+        .bot {
+            background: var(--bot-bg-light);
+            color: var(--text-light);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .bot {
+            background: var(--bot-bg-dark);
+            color: var(--text-dark);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Message metadata */
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .user .message-meta {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .bot .message-meta {
+            color: var(--text-light);
+        }
+
+        body.dark .bot .message-meta {
+            color: var(--text-dark);
+        }
+
+        /* Message actions (for TTS replay etc.) */
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .message-action-btn {
+            background: transparent;
+            border: none;
+            color: inherit;
+            /* Inherit color from parent message */
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .message-action-btn:hover {
+            opacity: 1;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-light);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        body.dark .typing-dot {
+            background: var(--text-dark);
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        /* Code blocks within messages */
+        .message pre {
+            background-color: var(--code-bg-light);
+            color: var(--code-text-light);
+            padding: 0.75em;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.85em;
+            margin-top: 0.75em;
+        }
+
+        body.dark .message pre {
+            background-color: var(--code-bg-dark);
+            color: var(--code-text-dark);
+        }
+
+        .message code {
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            background-color: rgba(0, 0, 0, 0.05);
+            /* Inline code bg */
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+
+        body.dark .message code {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Input Area --- */
+        .input-container {
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        body.dark .input-container {
+            border-top-color: var(--border-dark);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            border: 1px solid var(--input-border-light);
+            outline: none;
+            background: var(--card-light);
+            color: var(--text-light);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark input[type="text"] {
+            border-color: var(--input-border-dark);
+            background: var(--card-dark);
+            color: var(--text-dark);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        body.dark input[type="text"]:focus {
+            border-color: var(--accent-dark);
+            box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+        }
+
+
+        /* Send button */
+        button.send {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--user-msg-light), #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        body.dark button.send {
+            background: linear-gradient(135deg, var(--user-msg-dark), #7c3aed);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        button.send:hover {
+            background: linear-gradient(135deg, blue, #3b82f6);
+            transform: scale(1.05);
+            transition: 0.3s ease; /* FIX: was "0.3 ease" — missing "s" unit */
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.628);
+        }
+
+        body.dark button.send:hover {
+            background: linear-gradient(135deg, blue, #3b82f6);
+            transform: scale(1.05);
+            transition: 0.3s ease; /* FIX: was "0.3 ease" — missing "s" unit */
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.628);
+        }
+
+        button.send:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        button.send i {
+            font-size: 1rem;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media screen and (max-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                padding: 1.25rem;
+                border-radius: 12px;
+            }
+
+            .chat-title h2 {
+                font-size: 1.3rem;
+            }
+
+            .message {
+                max-width: 90%;
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+            }
+
+            input[type="text"] {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            button.send {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .audio-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .chat-container {
+                height: 550px;
+                width: 380px;
+                padding: 1rem;
+                border-radius: 20px;
+            }
+
+            .chat-title h2 {
+                font-size: 1.1rem;
+            }
+
+            .input-area {
+                gap: 0.5rem;
+            }
+
+            button.send span {
+                display: none;
+            }
+
+            button.send {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+                font-weight: 500;
+                justify-content: center;
+            }
+
+            .welcome-message {
+                padding: 0.75rem;
+            }
+
+            .welcome-message h3 {
+                font-size: 1rem;
+            }
+
+            .welcome-message p {
+                font-size: 0.85rem;
+            }
+
+            .audio-controls {
+                margin-right: 0.5rem;
+            }
+
+            .audio-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation for sending message */
+        @keyframes sendAnimation {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .sending {
+            animation: sendAnimation 0.3s ease;
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            align-self: center;
+            /* Center status messages */
+            text-align: center;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-light);
+            border-left: 3px solid var(--success-light);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-light);
+            border-left: 3px solid var(--warning-light);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-light);
+            border-left: 3px solid var(--error-light);
+        }
+
+        .status-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info-light);
+            border-left: 3px solid var(--info-light);
+        }
+
+        body.dark .status-success {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        body.dark .status-warning {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        body.dark .status-error {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        body.dark .status-info {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        /* Audio player styles (for direct audio if needed, not currently used by TTS) */
+        .audio-player {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        /* Voice recording UI */
+        .voice-recording-ui {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            justify-content: center;
+            /* Center the recording UI */
+            margin-bottom: 0.5rem;
+            /* Space between recording UI and input field */
+        }
+
+        .voice-recording-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--error-light);
+        }
+
+        body.dark .voice-recording-indicator {
+            color: var(--error-dark);
+        }
+
+        .recording-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--error-light);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        body.dark .recording-dot {
+            background-color: var(--error-dark);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .recording-timer {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .voice-recording-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .voice-control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.dark .voice-control-btn {
+            color: var(--text-dark);
+        }
+
+        .voice-control-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+        }
+
+        body.dark .voice-control-btn:hover {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--accent-dark);
+        }
+
+        .voice-control-btn.stop {
+            color: var(--error-light);
+        }
+
+        body.dark .voice-control-btn.stop {
+            color: var(--error-dark);
+        }
+
+        .voice-control-btn.stop:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        body.dark .voice-control-btn.stop:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .refresh-hint {
+            padding: 0.5rem 1rem;
+            width: 3.5rem;
+            height: 2.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--user-msg-light, #6366f1), #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+            user-select: none;
+        }
+
+        .refresh-hint::before {
+            content: "🧹";
+            font-size: 1.7rem;
+        }
+
+        .refresh-hint:hover {
+            background: linear-gradient(135deg, red, #980404);
+            transform: scale(1.05);
+            transition: 0.3s ease; /* FIX: was "0.3 ease" — missing "s" unit */
+            box-shadow: 0 5px 5px rgba(0, 0, 0, 0.628);
+        }
+
+        /* 💬 Modal Base Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+        }
+
+        /* 📦 Modal Content */
+        .modal-content {
+            background: #ffffff;
+            margin: 12% auto;
+            padding: 25px 20px;
+            width: 320px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+            animation: popIn 0.3s ease-out;
+        }
+
+        /* 🧩 Buttons */
+        .modal-actions button {
+            margin: 10px 8px 0;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+        }
+
+        /* ❌ Confirm Clear Button */
+        .modal-actions button:first-child {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .modal-actions button:first-child:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.5);
+        }
+
+        /* 🔙 Cancel Button */
+        .modal-actions button:last-child {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .modal-actions button:last-child:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.5);
+        }
+
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.85);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-title">
+                <i class="fas fa-graduation-cap chat-title-icon"></i>
+                <h2>CareerPath AI Advisor</h2>
+            </div>
+            <div class="audio-controls">
+                <button class="audio-btn" id="toggle-tts" title="Toggle Text-to-Speech">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button class="audio-btn" id="toggle-voice" title="Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="toggle-dark" id="toggle-dark">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="chat-box">
+            <div class="welcome-message">
+                <h3>Welcome to CareerPath AI Advisor</h3>
+                <p>I'm here to help you with career guidance, job search strategies, and professional development
+                    advice. How can I assist you today?</p>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div id="voice-recording-ui" class="voice-recording-ui hidden">
+                <div class="voice-recording-indicator">
+                    <div class="recording-dot"></div>
+                    <span class="recording-timer">00:00</span>
+                </div>
+                <div class="voice-recording-controls">
+                    <button class="voice-control-btn stop" id="stop-recording">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Ask about careers, jobs, or skills..."
+                    autocomplete="off" />
+                <button class="send" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Send</span>
+                </button>
+                <h6 class="refresh-hint" onclick="confirmRefreshClear()">
+                </h6>
+
+                <!-- Modal for confirmation -->
+                <div id="refreshClearModal" class="modal">
+                    <div class="modal-content">
+                        <p>Are you sure you want to refresh and clear the chat?</p>
+                        <div class="modal-actions">
+                            <button id="confirmRefreshClear">Yes</button>
+                            <button id="cancelRefreshClear">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="notification-sound"
+        src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3"></audio>
+    <audio id="send-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-click-tech-1109.mp3"></audio>
+    <audio id="start-recording-sound"
+        src="https://assets.mixkit.co/sfx/preview/mixkit-modern-interface-bleep-2148.mp3"></audio>
+    <audio id="stop-recording-sound"
+        src="https://assets.mixkit.co/sfx/preview/mixkit-modern-interface-bleep-2149.mp3"></audio>
+
+    <script>
+        // ─── Modal: Confirm Clear ────────────────────────────────────────────────
+        function confirmRefreshClear() {
+            document.getElementById("refreshClearModal").style.display = "block";
+        }
+
+        document.getElementById("confirmRefreshClear").onclick = function () {
+            localStorage.removeItem("chatHistory");
+            localStorage.removeItem("welcome-spoken"); // FIX: also clear TTS welcome flag on hard reset
+            location.reload();
+        };
+
+        document.getElementById("cancelRefreshClear").onclick = function () {
+            document.getElementById("refreshClearModal").style.display = "none";
+        };
+
+        // ─── DOM Elements ────────────────────────────────────────────────────────
+        const chatBox = document.getElementById("chat-box");
+        const inputEl = document.getElementById("user-input");
+        const toggleBtn = document.getElementById("toggle-dark");
+        const toggleTtsBtn = document.getElementById("toggle-tts");
+        const toggleVoiceBtn = document.getElementById("toggle-voice");
+        const voiceRecordingUI = document.getElementById("voice-recording-ui");
+        const stopRecordingBtn = document.getElementById("stop-recording");
+        const recordingTimer = document.querySelector(".recording-timer");
+
+        // ─── Audio Elements ──────────────────────────────────────────────────────
+        const notificationSound = document.getElementById("notification-sound");
+        const sendSound = document.getElementById("send-sound");
+        const startRecordingSound = document.getElementById("start-recording-sound");
+        const stopRecordingSound = document.getElementById("stop-recording-sound");
+
+        // ─── Speech Synthesis ────────────────────────────────────────────────────
+        const synth = window.speechSynthesis;
+        let ttsEnabled = false;
+        let currentUtterance = null;
+
+        // ─── Voice Recognition ───────────────────────────────────────────────────
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isRecording = false;
+        let recordingStartTime = 0;
+        let recordingTimerInterval = null;
+
+        // ─── Conversation History ────────────────────────────────────────────────
+        let conversationHistory = [
+            {
+                role: "system",
+                content: "You are CareerPath AI, a professional career advisor. Provide thoughtful, personalized career guidance. Be concise but thorough. Format responses with clear paragraphs, bullet points, numbered lists, and code blocks when appropriate. Always maintain a professional tone. If asked about non-career topics, politely redirect to career-related discussions."
+            },
+            {
+                role: "assistant",
+                content: "Welcome to CareerPath AI Advisor\n\nI'm here to help you with career guidance, job search strategies, and professional development advice. How can I assist you today?"
+            }
+        ];
+
+        // ─── Init ────────────────────────────────────────────────────────────────
+        function init() {
+            loadPreferences();
+            setupEventListeners();
+            inputEl.focus();
+
+            if (ttsEnabled) {
+                const lastBotMessage = [...conversationHistory].reverse().find(msg => msg.role === "assistant");
+                if (lastBotMessage && !localStorage.getItem("welcome-spoken")) {
+                    speak(lastBotMessage.content);
+                    localStorage.setItem("welcome-spoken", "true");
+                }
+            }
+        }
+
+        // ─── Load Preferences ────────────────────────────────────────────────────
+        function loadPreferences() {
+            // Dark mode
+            const isDark = localStorage.getItem("dark-mode") === "true";
+            if (isDark) {
+                document.body.classList.add("dark");
+                toggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // TTS
+            const ttsPref = localStorage.getItem("tts-enabled");
+            ttsEnabled = ttsPref === null ? false : ttsPref === "true";
+            updateTtsButton();
+
+            // Speech recognition
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    inputEl.placeholder = "Listening...";
+                    toggleVoiceBtn.classList.add("active");
+                    playStartRecordingSound();
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    inputEl.value = transcript;
+                    stopRecording();
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    voiceRecordingUI.classList.add("hidden");
+                    clearInterval(recordingTimerInterval);
+                    toggleVoiceBtn.classList.remove("active");
+                    inputEl.placeholder = "Ask about careers, jobs, or skills...";
+                    inputEl.focus();
+                    playStopRecordingSound();
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error', event.error);
+                    stopRecording();
+                    appendStatusMessage(`Voice input error: ${event.error}`, 'error');
+                };
+            } else {
+                toggleVoiceBtn.disabled = true;
+                toggleVoiceBtn.title = "Voice input not supported in your browser";
+                toggleVoiceBtn.style.opacity = '0.5';
+                toggleVoiceBtn.style.cursor = 'not-allowed';
+            }
+        }
+
+        // ─── Event Listeners ─────────────────────────────────────────────────────
+        function setupEventListeners() {
+            toggleBtn.addEventListener("click", toggleDarkMode);
+            toggleTtsBtn.addEventListener("click", toggleTts);
+            toggleVoiceBtn.addEventListener("click", toggleVoiceInput);
+            stopRecordingBtn.addEventListener("click", stopRecording);
+
+            inputEl.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            synth.onvoiceschanged = () => {};
+        }
+
+        // ─── Dark Mode ───────────────────────────────────────────────────────────
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle("dark");
+            localStorage.setItem("dark-mode", isDark);
+            toggleBtn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            playNotificationSound();
+        }
+
+        // ─── TTS ─────────────────────────────────────────────────────────────────
+        function toggleTts() {
+            ttsEnabled = !ttsEnabled;
+            localStorage.setItem("tts-enabled", ttsEnabled);
+            updateTtsButton();
+            playNotificationSound();
+
+            if (!ttsEnabled && currentUtterance && synth.speaking) {
+                synth.cancel();
+            }
+        }
+
+        function updateTtsButton() {
+            toggleTtsBtn.classList.toggle("active", ttsEnabled);
+            toggleTtsBtn.innerHTML = ttsEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            toggleTtsBtn.title = ttsEnabled ? "Disable Text-to-Speech" : "Enable Text-to-Speech";
+        }
+
+        function speak(text) {
+            if (!ttsEnabled) return;
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'en-US';
+            currentUtterance.rate = 1.0;
+            currentUtterance.pitch = 1.0;
+
+            const voices = synth.getVoices();
+            const preferredVoice = voices.find(voice =>
+                voice.name.includes('Google US English') || voice.name.includes('Microsoft Zira') || voice.default
+            );
+            if (preferredVoice) {
+                currentUtterance.voice = preferredVoice;
+            }
+
+            currentUtterance.onend = () => { currentUtterance = null; };
+            currentUtterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event);
+                appendStatusMessage(`TTS error: ${event.error}`, 'error');
+            };
+
+            synth.speak(currentUtterance);
+        }
+
+        function speakMessage(buttonElement) {
+            const messageDiv = buttonElement.closest('.message');
+            const messageText = messageDiv.querySelector('div:first-child').innerText;
+            speak(messageText);
+        }
+
+        // ─── Voice Input ─────────────────────────────────────────────────────────
+        function toggleVoiceInput() {
+            if (!recognition) {
+                appendStatusMessage("Voice input is not supported in your browser", "error");
+                return;
+            }
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            if (!recognition) return;
+            try {
+                recognition.start();
+                isRecording = true;
+                voiceRecordingUI.classList.remove("hidden");
+                recordingStartTime = Date.now();
+                updateRecordingTimer();
+                recordingTimerInterval = setInterval(updateRecordingTimer, 1000);
+            } catch (err) {
+                console.error("Error starting voice recognition:", err);
+                appendStatusMessage("Error starting voice input. Please check microphone permissions.", "error");
+                stopRecording();
+            }
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        function updateRecordingTimer() {
+            const seconds = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            recordingTimer.textContent =
+                `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // ─── Sound Effects ───────────────────────────────────────────────────────
+        function playNotificationSound() {
+            notificationSound.currentTime = 0;
+            notificationSound.play().catch(e => console.warn("Notification sound play failed:", e));
+        }
+
+        function playSendSound() {
+            sendSound.currentTime = 0;
+            sendSound.play().catch(e => console.warn("Send sound play failed:", e));
+        }
+
+        function playStartRecordingSound() {
+            startRecordingSound.currentTime = 0;
+            startRecordingSound.play().catch(e => console.warn("Start recording sound play failed:", e));
+        }
+
+        function playStopRecordingSound() {
+            stopRecordingSound.currentTime = 0;
+            stopRecordingSound.play().catch(e => console.warn("Stop recording sound play failed:", e));
+        }
+
+        // ─── Message Rendering ───────────────────────────────────────────────────
+        function appendMessage(sender, text, isThinking = false) {
+            const msg = document.createElement("div");
+            msg.className = `message ${sender}`;
+
+            if (isThinking) {
+                msg.innerHTML = `
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+            } else {
+                const formattedText = formatMessageText(text);
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                msg.innerHTML = `
+                    <div>${formattedText}</div>
+                    <div class="message-meta">
+                        <span>${sender === 'user' ? 'You' : 'Career Advisor'}</span>
+                        <span>${timestamp}</span>
+                    </div>
+                    ${sender === 'bot' ? `
+                    <div class="message-actions">
+                        <button class="message-action-btn" onclick="speakMessage(this)">
+                            <i class="fas fa-volume-up"></i>
+                            <span>Hear this</span>
+                        </button>
+                    </div>
+                    ` : ''}
+                `;
+            }
+
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendStatusMessage(text, type = "info") {
+            const msg = document.createElement("div");
+            msg.className = `status-indicator status-${type}`;
+            msg.innerHTML = `
+                <i class="fas fa-${getStatusIcon(type)}"></i>
+                <span>${text}</span>
+            `;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function getStatusIcon(type) {
+            switch (type) {
+                case 'success': return 'check-circle';
+                case 'warning': return 'exclamation-triangle';
+                case 'error': return 'times-circle';
+                default: return 'info-circle';
+            }
+        }
+
+        // ─── Format Message Text ─────────────────────────────────────────────────
+        // FIX: Rewrote this function. The original had clearChat() buried inside it
+        //      (unreachable), and the bullet regex /^-?\s*(.*)$/gm turned EVERY line
+        //      into <li> because the dash was optional ("-?"). Also, listType detection
+        //      ran after lines were already converted to <li>...</li>, so numbered
+        //      lists were always rendered as <ul>.
+        function formatMessageText(text) {
+            // Protect code blocks first — extract them so inner content isn't processed
+            const codeBlocks = [];
+            text = text.replace(/```([\s\S]*?)```/g, (match, code) => {
+                codeBlocks.push(`<pre><code>${escapeHtml(code)}</code></pre>`);
+                return `%%CODEBLOCK_${codeBlocks.length - 1}%%`;
+            });
+
+            // Inline code
+            const inlineCodes = [];
+            text = text.replace(/`([^`]+)`/g, (match, code) => {
+                inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
+                return `%%INLINECODE_${inlineCodes.length - 1}%%`;
+            });
+
+            // Bold and italic
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+            // Process lines — FIX: only match lines that actually start with "- " or "N. "
+            const lines = text.split('\n');
+            const processedLines = [];
+            let listStack = []; // track open list types
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+
+                const isBullet = /^-\s+(.+)/.test(trimmed);        // must have "- " + content
+                const isNumbered = /^\d+\.\s+(.+)/.test(trimmed);  // must have "N. " + content
+                const isListItem = isBullet || isNumbered;
+                const currentListType = isNumbered ? 'ol' : 'ul';
+
+                if (isListItem) {
+                    const itemText = trimmed.replace(/^(-\s+|\d+\.\s+)/, '');
+
+                    // Open list if not already open, or switch type
+                    if (listStack.length === 0 || listStack[listStack.length - 1] !== currentListType) {
+                        // Close previous list if open
+                        if (listStack.length > 0) {
+                            processedLines.push(`</${listStack.pop()}>`);
+                        }
+                        processedLines.push(`<${currentListType}>`);
+                        listStack.push(currentListType);
+                    }
+                    processedLines.push(`<li>${itemText}</li>`);
+                } else {
+                    // Close any open lists
+                    while (listStack.length > 0) {
+                        processedLines.push(`</${listStack.pop()}>`);
+                    }
+                    processedLines.push(line);
+                }
+            }
+
+            // Close any remaining open lists
+            while (listStack.length > 0) {
+                processedLines.push(`</${listStack.pop()}>`);
+            }
+
+            text = processedLines.join('\n');
+
+            // Wrap double-newline-separated blocks in <p> (skip list/code blocks)
+            text = text.split('\n\n').map(paragraph => {
+                const p = paragraph.trim();
+                if (!p) return '';
+                if (p.startsWith('<ul>') || p.startsWith('<ol>') || p.startsWith('<pre>') ||
+                    p.startsWith('%%CODEBLOCK')) {
+                    return p;
+                }
+                return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
+
+            // Restore code blocks
+            text = text.replace(/%%CODEBLOCK_(\d+)%%/g, (_, i) => codeBlocks[parseInt(i)]);
+            text = text.replace(/%%INLINECODE_(\d+)%%/g, (_, i) => inlineCodes[parseInt(i)]);
+
+            return text;
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // ─── Clear Chat ──────────────────────────────────────────────────────────
+        // FIX: Moved clearChat() out of formatMessageText() where it was trapped,
+        //      and fixed it to target "chat-box" (not "user-input").
+        function clearChat() {
+            conversationHistory = [
+                {
+                    role: "system",
+                    content: "You are CareerPath AI, a professional career advisor. Provide thoughtful, personalized career guidance. Be concise but thorough. Format responses with clear paragraphs, bullet points, numbered lists, and code blocks when appropriate. Always maintain a professional tone. If asked about non-career topics, politely redirect to career-related discussions."
+                }
+            ];
+            const container = document.getElementById("chat-box");
+            if (container) {
+                container.innerHTML = "";
+            }
+        }
+
+        // ─── API Call ────────────────────────────────────────────────────────────
+        async function getBotResponse(userInput) {
+            try {
+                conversationHistory.push({ role: "user", content: userInput });
+
+                const response = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ messages: conversationHistory })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Server Error");
+                }
+
+                const botMessage = data.reply || "No response.";
+                conversationHistory.push({ role: "assistant", content: botMessage });
+                return botMessage;
+
+            } catch (error) {
+                console.error("Error fetching bot response:", error);
+                return "Oops! Something went wrong. Please try again.";
+            }
+        }
+
+        // ─── Send Message ────────────────────────────────────────────────────────
+        // FIX: The original had sendMessage() defined TWICE — an outer function with
+        //      an inner function of the same name nested inside. The outer function
+        //      called the inner but never awaited/executed it correctly, so clicking
+        //      Send did nothing. Merged into one clean function.
+        async function sendMessage() {
+            const userInput = inputEl.value.trim();
+            if (!userInput) return;
+
+            playSendSound();
+
+            // Show user message
+            appendMessage("user", userInput);
+
+            // Clear input
+            inputEl.value = "";
+
+            // Show typing indicator
+            appendMessage("bot", "", true);
+
+            try {
+                const botReply = await getBotResponse(userInput);
+
+                // Remove typing indicator
+                const typingIndicator = document.querySelector(".message.bot:last-child");
+                if (typingIndicator && typingIndicator.querySelector(".typing-indicator")) {
+                    typingIndicator.remove();
+                }
+
+                // Show AI response
+                appendMessage("bot", botReply);
+
+                // Speak response if TTS enabled
+                if (ttsEnabled) {
+                    speak(botReply);
+                }
+
+            } catch (error) {
+                console.error(error);
+
+                const typingIndicator = document.querySelector(".message.bot:last-child");
+                if (typingIndicator && typingIndicator.querySelector(".typing-indicator")) {
+                    typingIndicator.remove();
+                }
+
+                appendMessage("bot", "Sorry, something went wrong.");
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>
